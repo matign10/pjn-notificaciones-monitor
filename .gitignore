@@ -1,0 +1,58 @@
+# Node
+node_modules/
+dist/
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Data
+data/
+!data/.gitkeep
+cookies/
+*.sqlite
+*.db
+
+# Logs
+logs/
+*.log
+
+# PDFs
+*.pdf
+pdfs/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+temp/
+tmp/
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Screenshots
+screenshots/
+*.png
+*.jpg
+*.jpeg
+
+# Backup
+*.bak
+*.backup
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# TypeScript cache
+*.tsbuildinfo

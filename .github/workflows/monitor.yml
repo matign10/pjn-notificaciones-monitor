@@ -1,0 +1,66 @@
+name: PJN Monitor - Verificación Automática
+
+on:
+  schedule:
+    # Ejecutar cada 30 minutos
+    - cron: '*/30 * * * *'
+  workflow_dispatch: # Permite ejecutar manualmente desde GitHub
+  push:
+    branches: [ main, master ] # Para testing inicial
+
+jobs:
+  check-notifications:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Configurar Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Instalar dependencias
+      run: npm ci
+    
+    - name: Instalar Playwright
+      run: |
+        npx playwright install --with-deps chromium
+        npx playwright install-deps
+    
+    - name: Restaurar estado de base de datos
+      uses: actions/download-artifact@v4
+      with:
+        name: database-state
+        path: ./data
+      continue-on-error: true
+    
+    - name: Ejecutar verificación
+      env:
+        PJN_USERNAME: ${{ secrets.PJN_USERNAME }}
+        PJN_PASSWORD: ${{ secrets.PJN_PASSWORD }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        NODE_ENV: production
+        HEADLESS_MODE: true
+      run: npm run check:now
+    
+    - name: Guardar estado de base de datos
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: database-state
+        path: ./data/database.sqlite
+        retention-days: 90
+    
+    - name: Guardar logs en caso de error
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: error-logs
+        path: ./data/logs/
+        retention-days: 7
