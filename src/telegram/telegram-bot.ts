@@ -329,18 +329,22 @@ ${expedientes.map((exp, index) =>
     try {
       const mensaje = `📊 <b>ESTADO DEL SISTEMA PJN MONITOR</b>
 
-🔄 <b>Sistema:</b> Operativo
-📅 <b>Último reporte:</b> ${dayjs().format('DD/MM/YYYY HH:mm:ss')}
+🔄 <b>Sistema:</b> ✅ Operativo
+📅 <b>Verificación:</b> ${dayjs().format('DD/MM/YYYY HH:mm:ss')}
 
 📊 <b>Estadísticas:</b>
 📋 Expedientes monitoreados: ${estadisticas.totalExpedientes}
 🔔 Con notificaciones: ${estadisticas.expedientesConNotificaciones}
-📤 Pendientes de envío: ${estadisticas.notificacionesPendientes}
-✅ Enviadas: ${estadisticas.notificacionesEnviadas}
+📤 Nuevas enviadas: ${estadisticas.notificacionesEnviadas}
 
 ⏰ <b>Próxima verificación:</b> En ${config.app.checkIntervalMinutes} minutos
 
-🤖 <i>Monitoreo automático activo</i>`;
+${estadisticas.notificacionesEnviadas > 0 ? 
+  `🎉 <b>Se enviaron ${estadisticas.notificacionesEnviadas} notificaciones nuevas</b>` :
+  '😴 <b>No hay notificaciones nuevas</b>'
+}
+
+🤖 <i>Monitoreo automático funcionando</i>`;
 
       const mensajeEnviado = await this.bot.telegram.sendMessage(
         this.config.chatId,

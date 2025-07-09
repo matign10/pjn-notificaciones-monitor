@@ -261,7 +261,17 @@ export class PJNMonitor {
       
       logger.info(`📊 Estadísticas: ${estadisticas.totalExpedientes} expedientes, ${estadisticas.expedientesConNotificaciones} con notificaciones`);
 
-      // 4. Marcar como exitosa
+      // 4. Enviar estado del sistema por Telegram (para monitoreo)
+      if (this.config.enableTelegramNotifications) {
+        await this.enviarEstadoSistema({
+          totalExpedientes: estadisticas.totalExpedientes,
+          expedientesConNotificaciones: estadisticas.expedientesConNotificaciones,
+          notificacionesPendientes: estadisticas.notificacionesPendientes,
+          notificacionesEnviadas: estadisticas.notificacionesEnviadas
+        });
+      }
+
+      // 5. Marcar como exitosa
       resultado.success = true;
       this.status.successfulChecks++;
       this.status.lastError = null;
