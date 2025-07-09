@@ -247,10 +247,10 @@ export class PJNMonitor {
           await this.procesarNotificacion(notificacion, resultado);
         }
 
-        // Enviar resumen por Telegram
-        if (this.config.enableTelegramNotifications && resultado.notificacionesEnviadas > 0) {
-          await this.enviarResumenNotificaciones(resultadoScraping.nuevasNotificaciones);
-        }
+        // Resumen por Telegram deshabilitado - solo enviar notificaciones individuales
+        // if (this.config.enableTelegramNotifications && resultado.notificacionesEnviadas > 0) {
+        //   await this.enviarResumenNotificaciones(resultadoScraping.nuevasNotificaciones);
+        // }
 
       } else {
         logger.info('✅ No se encontraron nuevas notificaciones');
