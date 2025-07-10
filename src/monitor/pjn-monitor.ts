@@ -263,7 +263,7 @@ export class PJNMonitor {
 
       // 4. Enviar estado del sistema por Telegram (para monitoreo)
       if (this.config.enableTelegramNotifications) {
-        await this.enviarEstadoSistema({
+        await this.telegramBot.enviarEstadoSistema({
           totalExpedientes: estadisticas.totalExpedientes,
           expedientesConNotificaciones: estadisticas.expedientesConNotificaciones,
           notificacionesPendientes: estadisticas.notificacionesPendientes,
