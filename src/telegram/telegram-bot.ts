@@ -4,6 +4,10 @@ import { Expediente } from '../database/database';
 // import fs from 'fs/promises'; // Removido con PDFs
 // import path from 'path'; // Removido con PDFs
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+// Configurar plugin UTC
+dayjs.extend(utc);
 
 export interface TelegramConfig {
   botToken: string;
