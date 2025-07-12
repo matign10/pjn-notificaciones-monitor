@@ -9,12 +9,12 @@ npm-debug.log*
 .env.local
 .env.*.local
 
-# Data
-data/
-!data/.gitkeep
+# Data (permitir database.sqlite para persistencia en GitHub Actions)
+data/logs/
+data/temp/
+!data/database.sqlite
+!data/cookies/
 cookies/
-*.sqlite
-*.db
 
 # Logs
 logs/
