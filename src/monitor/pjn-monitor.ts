@@ -44,6 +44,7 @@ export class PJNMonitor {
   private status: MonitorStatus;
   private cronJob: cron.ScheduledTask | null = null;
   private isVerifying: boolean = false;
+  private ultimoEnvioEstado: Date | null = null;
 
   constructor(monitorConfig?: Partial<MonitorConfig>) {
     this.config = {
@@ -104,13 +105,8 @@ export class PJNMonitor {
         logger.info('📱 Inicializando bot de Telegram...');
         await this.telegramBot.initialize();
         
-        // Enviar mensaje de inicio
-        await this.telegramBot.enviarEstadoSistema({
-          totalExpedientes: 0,
-          expedientesConNotificaciones: 0,
-          notificacionesPendientes: 0,
-          notificacionesEnviadas: 0
-        });
+        // No enviar mensaje de estado en inicialización
+        // Solo durante verificaciones programadas cada 4 horas
       }
 
       logger.info('✅ PJN Monitor inicializado completamente');
@@ -261,8 +257,16 @@ export class PJNMonitor {
       
       logger.info(`📊 Estadísticas: ${estadisticas.totalExpedientes} expedientes, ${estadisticas.expedientesConNotificaciones} con notificaciones`);
 
-      // 4. No enviar estado del sistema automáticamente
-      // Solo las notificaciones individuales son necesarias
+      // 4. Enviar estado del sistema cada 4 horas para monitoreo
+      if (this.config.enableTelegramNotifications && this.debeEnviarEstadoSistema()) {
+        await this.telegramBot.enviarEstadoSistema({
+          totalExpedientes: estadisticas.totalExpedientes,
+          expedientesConNotificaciones: estadisticas.expedientesConNotificaciones,
+          notificacionesPendientes: estadisticas.notificacionesPendientes,
+          notificacionesEnviadas: resultado.notificacionesEnviadas
+        });
+        this.marcarUltimoEnvioEstado();
+      }
 
       // 5. Marcar como exitosa
       resultado.success = true;
@@ -471,6 +475,25 @@ export class PJNMonitor {
     } catch (error) {
       logger.error('Error al cerrar PJN Monitor:', error);
     }
+  }
+
+  /**
+   * Verifica si debe enviar mensaje de estado (cada 4 horas)
+   */
+  private debeEnviarEstadoSistema(): boolean {
+    if (!this.ultimoEnvioEstado) {
+      return true; // Primer envío
+    }
+    
+    const horasTranscurridas = (Date.now() - this.ultimoEnvioEstado.getTime()) / (1000 * 60 * 60);
+    return horasTranscurridas >= 4;
+  }
+
+  /**
+   * Marca el timestamp del último envío de estado
+   */
+  private marcarUltimoEnvioEstado(): void {
+    this.ultimoEnvioEstado = new Date();
   }
 
   /**
