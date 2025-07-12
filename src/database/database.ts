@@ -93,6 +93,14 @@ export class PJNDatabase {
       )
     `);
 
+    await this.db.exec(`
+      CREATE TABLE IF NOT EXISTS configuraciones (
+        clave TEXT PRIMARY KEY,
+        valor TEXT NOT NULL,
+        updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // Crear índices para optimizar consultas
     await this.db.exec(`
       CREATE INDEX IF NOT EXISTS idx_expedientes_numero ON expedientes (numero);
@@ -345,6 +353,31 @@ export class PJNDatabase {
       logger.error('Error al resetear base de datos:', error);
       throw error;
     }
+  }
+
+  /**
+   * Guarda una configuración
+   */
+  async setConfiguracion(clave: string, valor: string): Promise<void> {
+    if (!this.db) throw new Error('Base de datos no inicializada');
+    
+    await this.db.run(`
+      INSERT OR REPLACE INTO configuraciones (clave, valor, updatedAt)
+      VALUES (?, ?, CURRENT_TIMESTAMP)
+    `, [clave, valor]);
+  }
+
+  /**
+   * Obtiene una configuración
+   */
+  async getConfiguracion(clave: string): Promise<string | null> {
+    if (!this.db) throw new Error('Base de datos no inicializada');
+    
+    const result = await this.db.get(`
+      SELECT valor FROM configuraciones WHERE clave = ?
+    `, [clave]);
+    
+    return result?.valor || null;
   }
 
   /**

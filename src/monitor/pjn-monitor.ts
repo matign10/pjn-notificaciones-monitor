@@ -44,7 +44,6 @@ export class PJNMonitor {
   private status: MonitorStatus;
   private cronJob: cron.ScheduledTask | null = null;
   private isVerifying: boolean = false;
-  private ultimoEnvioEstado: Date | null = null;
 
   constructor(monitorConfig?: Partial<MonitorConfig>) {
     this.config = {
@@ -243,11 +242,6 @@ export class PJNMonitor {
           await this.procesarNotificacion(notificacion, resultado);
         }
 
-        // Resumen por Telegram deshabilitado - solo enviar notificaciones individuales
-        // if (this.config.enableTelegramNotifications && resultado.notificacionesEnviadas > 0) {
-        //   await this.enviarResumenNotificaciones(resultadoScraping.nuevasNotificaciones);
-        // }
-
       } else {
         logger.info('✅ No se encontraron nuevas notificaciones');
       }
@@ -258,14 +252,14 @@ export class PJNMonitor {
       logger.info(`📊 Estadísticas: ${estadisticas.totalExpedientes} expedientes, ${estadisticas.expedientesConNotificaciones} con notificaciones`);
 
       // 4. Enviar estado del sistema cada 4 horas para monitoreo
-      if (this.config.enableTelegramNotifications && this.debeEnviarEstadoSistema()) {
+      if (this.config.enableTelegramNotifications && await this.debeEnviarEstadoSistema()) {
         await this.telegramBot.enviarEstadoSistema({
           totalExpedientes: estadisticas.totalExpedientes,
           expedientesConNotificaciones: estadisticas.expedientesConNotificaciones,
           notificacionesPendientes: estadisticas.notificacionesPendientes,
           notificacionesEnviadas: resultado.notificacionesEnviadas
         });
-        this.marcarUltimoEnvioEstado();
+        await this.marcarUltimoEnvioEstado();
       }
 
       // 5. Marcar como exitosa
@@ -480,20 +474,31 @@ export class PJNMonitor {
   /**
    * Verifica si debe enviar mensaje de estado (cada 4 horas)
    */
-  private debeEnviarEstadoSistema(): boolean {
-    if (!this.ultimoEnvioEstado) {
-      return true; // Primer envío
+  private async debeEnviarEstadoSistema(): Promise<boolean> {
+    try {
+      const ultimoEnvioStr = await this.db.getConfiguracion('ultimo_envio_estado');
+      if (!ultimoEnvioStr) {
+        return true; // Primer envío
+      }
+      
+      const ultimoEnvio = new Date(ultimoEnvioStr);
+      const horasTranscurridas = (Date.now() - ultimoEnvio.getTime()) / (1000 * 60 * 60);
+      return horasTranscurridas >= 4;
+    } catch (error) {
+      logger.error('Error al verificar último envío de estado:', error);
+      return true; // En caso de error, enviar
     }
-    
-    const horasTranscurridas = (Date.now() - this.ultimoEnvioEstado.getTime()) / (1000 * 60 * 60);
-    return horasTranscurridas >= 4;
   }
 
   /**
    * Marca el timestamp del último envío de estado
    */
-  private marcarUltimoEnvioEstado(): void {
-    this.ultimoEnvioEstado = new Date();
+  private async marcarUltimoEnvioEstado(): Promise<void> {
+    try {
+      await this.db.setConfiguracion('ultimo_envio_estado', new Date().toISOString());
+    } catch (error) {
+      logger.error('Error al marcar último envío de estado:', error);
+    }
   }
 
   /**

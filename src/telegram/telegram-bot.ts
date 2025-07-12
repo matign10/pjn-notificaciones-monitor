@@ -335,7 +335,7 @@ ${expedientes.map((exp, index) =>
       const mensaje = `📊 <b>ESTADO DEL SISTEMA PJN MONITOR</b>
 
 🔄 <b>Sistema:</b> ✅ Operativo
-📅 <b>Verificación:</b> ${dayjs().format('DD/MM/YYYY HH:mm:ss')}
+📅 <b>Verificación:</b> ${dayjs().utc().utcOffset(-3).format('DD/MM/YYYY HH:mm:ss')}
 
 📊 <b>Estadísticas:</b>
 📋 Expedientes monitoreados: ${estadisticas.totalExpedientes}
