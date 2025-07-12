@@ -261,15 +261,8 @@ export class PJNMonitor {
       
       logger.info(`📊 Estadísticas: ${estadisticas.totalExpedientes} expedientes, ${estadisticas.expedientesConNotificaciones} con notificaciones`);
 
-      // 4. Enviar estado del sistema solo si hay notificaciones nuevas
-      if (this.config.enableTelegramNotifications && resultado.notificacionesEnviadas > 0) {
-        await this.telegramBot.enviarEstadoSistema({
-          totalExpedientes: estadisticas.totalExpedientes,
-          expedientesConNotificaciones: estadisticas.expedientesConNotificaciones,
-          notificacionesPendientes: estadisticas.notificacionesPendientes,
-          notificacionesEnviadas: estadisticas.notificacionesEnviadas
-        });
-      }
+      // 4. No enviar estado del sistema automáticamente
+      // Solo las notificaciones individuales son necesarias
 
       // 5. Marcar como exitosa
       resultado.success = true;

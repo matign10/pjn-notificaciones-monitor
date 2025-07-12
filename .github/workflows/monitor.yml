@@ -32,12 +32,24 @@ jobs:
         npx playwright install --with-deps chromium
         npx playwright install-deps
     
+    - name: Crear directorio de datos
+      run: mkdir -p ./data/cookies
+    
     - name: Restaurar estado de base de datos
       uses: actions/download-artifact@v4
       with:
         name: database-state
         path: ./data
       continue-on-error: true
+    
+    - name: Verificar archivos restaurados
+      run: |
+        echo "Contenido de ./data:"
+        ls -la ./data/ || echo "Directorio data no existe"
+        echo "Base de datos existe:" 
+        ls -la ./data/database.sqlite || echo "database.sqlite no existe"
+        echo "Cookies existen:"
+        ls -la ./data/cookies/ || echo "cookies no existen"
     
     - name: Ejecutar verificación
       env:
