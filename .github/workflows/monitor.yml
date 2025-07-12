@@ -54,7 +54,9 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: database-state
-        path: ./data/database.sqlite
+        path: |
+          ./data/database.sqlite
+          ./data/cookies/
         retention-days: 90
     
     - name: Guardar logs en caso de error

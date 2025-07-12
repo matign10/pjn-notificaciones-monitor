@@ -261,8 +261,8 @@ export class PJNMonitor {
       
       logger.info(`📊 Estadísticas: ${estadisticas.totalExpedientes} expedientes, ${estadisticas.expedientesConNotificaciones} con notificaciones`);
 
-      // 4. Enviar estado del sistema por Telegram (para monitoreo)
-      if (this.config.enableTelegramNotifications) {
+      // 4. Enviar estado del sistema solo si hay notificaciones nuevas
+      if (this.config.enableTelegramNotifications && resultado.notificacionesEnviadas > 0) {
         await this.telegramBot.enviarEstadoSistema({
           totalExpedientes: estadisticas.totalExpedientes,
           expedientesConNotificaciones: estadisticas.expedientesConNotificaciones,

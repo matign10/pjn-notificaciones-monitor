@@ -211,7 +211,8 @@ Por ahora, puedes revisar los logs del sistema para ver la actividad.`);
    */
   private formatearMensajeNotificacion(notificacion: NotificationMessage): string {
     const icono = notificacion.urgente ? '🚨' : '🔔';
-    const fecha = dayjs(notificacion.fecha).format('DD/MM/YYYY HH:mm');
+    // Usar timezone de Argentina
+    const fecha = dayjs(notificacion.fecha).utc().utcOffset(-3).format('DD/MM/YYYY HH:mm');
     
     let mensaje = `${icono} <b>NUEVA NOTIFICACIÓN JUDICIAL</b>
 
