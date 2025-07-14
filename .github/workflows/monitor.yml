@@ -50,18 +50,13 @@ jobs:
         PJN_PASSWORD: ${{ secrets.PJN_PASSWORD }}
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         NODE_ENV: production
         HEADLESS_MODE: true
       run: npm run check:now
     
-    - name: Commit y push de base de datos actualizada
-      if: always()
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add ./data/ || true
-        git commit -m "Auto-update: database state $(date)" || true
-        git push || true
+    # Ya no necesitamos commits - Supabase persiste automáticamente
     
     - name: Guardar logs en caso de error
       if: failure()

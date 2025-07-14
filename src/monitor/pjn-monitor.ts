@@ -2,6 +2,7 @@ import { NotificationScraper } from '../scraper/notification-scraper';
 // import { PDFGenerator } from '../pdf/pdf-generator'; // Removido
 import { TelegramBot } from '../telegram/telegram-bot';
 import { PJNDatabase } from '../database/database';
+import { SupabaseDatabase } from '../database/supabase-database';
 import { config, logger } from '../config';
 import { PJNAuth } from '../auth/pjn-auth';
 import * as cron from 'node-cron';
@@ -75,7 +76,7 @@ export class PJNMonitor {
 
     this.scraper = new NotificationScraper();
     this.telegramBot = new TelegramBot();
-    this.db = new PJNDatabase();
+    this.db = new SupabaseDatabase(); // Usar Supabase en lugar de SQLite
   }
 
   /**

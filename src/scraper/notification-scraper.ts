@@ -1,6 +1,7 @@
 import { Page } from 'playwright';
 import { PJNAuth } from '../auth/pjn-auth';
 import { PJNDatabase, Expediente } from '../database/database';
+import { SupabaseDatabase } from '../database/supabase-database';
 import { config, logger } from '../config';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
@@ -33,7 +34,7 @@ export class NotificationScraper {
       headless: config.app.headlessMode
     });
     
-    this.db = new PJNDatabase();
+    this.db = new SupabaseDatabase(); // Usar Supabase en lugar de SQLite
   }
 
   /**
