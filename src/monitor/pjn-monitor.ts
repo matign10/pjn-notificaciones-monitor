@@ -252,16 +252,16 @@ export class PJNMonitor {
       
       logger.info(`📊 Estadísticas: ${estadisticas.totalExpedientes} expedientes, ${estadisticas.expedientesConNotificaciones} con notificaciones`);
 
-      // 4. Enviar estado del sistema cada 4 horas para monitoreo
-      if (this.config.enableTelegramNotifications && await this.debeEnviarEstadoSistema()) {
-        await this.telegramBot.enviarEstadoSistema({
-          totalExpedientes: estadisticas.totalExpedientes,
-          expedientesConNotificaciones: estadisticas.expedientesConNotificaciones,
-          notificacionesPendientes: estadisticas.notificacionesPendientes,
-          notificacionesEnviadas: resultado.notificacionesEnviadas
-        });
-        await this.marcarUltimoEnvioEstado();
-      }
+      // 4. Enviar estado del sistema cada 4 horas para monitoreo - DESACTIVADO
+//      if (this.config.enableTelegramNotifications && await this.debeEnviarEstadoSistema()) {
+//        await this.telegramBot.enviarEstadoSistema({
+//          totalExpedientes: estadisticas.totalExpedientes,
+//          expedientesConNotificaciones: estadisticas.expedientesConNotificaciones,
+//          notificacionesPendientes: estadisticas.notificacionesPendientes,
+//          notificacionesEnviadas: resultado.notificacionesEnviadas
+//        });
+//        await this.marcarUltimoEnvioEstado();
+//      }
 
       // 5. Marcar como exitosa
       resultado.success = true;
