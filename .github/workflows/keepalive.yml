@@ -1,0 +1,30 @@
+name: Keepalive
+
+# GitHub desactiva automaticamente los workflows programados (cron) tras 60
+# dias sin actividad (commits) en el repo. El monitor no commitea nada, asi
+# que el repo quedaba "inactivo" y el cron se apagaba (paso el 2026-09-04).
+# Este workflow hace un commit chico cada 1 y 15 del mes para mantener el
+# repo activo y evitar que se vuelva a apagar.
+
+on:
+  schedule:
+    - cron: '0 6 1,15 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Commit para resetear el timer de inactividad de 60 dias
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > .keepalive
+          git add .keepalive
+          git commit -m "chore: keepalive (mantener el cron activo) [skip ci]" || echo "sin cambios"
+          git push
